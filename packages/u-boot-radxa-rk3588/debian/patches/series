@@ -1,0 +1,15 @@
+0001-arch-arm-mach-rockchip-fix-srctree-path.patch
+0002-board-rockchip-Add-the-Mixtile-Core-3588E.patch
+0003-board-rockchip-Add-support-for-the-NanoPi-R6-and-Nan.patch
+0004-add-the-lubancat4.patch
+0005-add-the-indiedroid-nova.patch
+0006-add-defconfig-and-dts-of-armsom-w3.patch
+0007-add-defconfig-and-dts-of-armsom-sige7.patch
+0008-board-add-roc-rk3588s-pc-support.patch
+0009-fix-gcc13-compile-error.patch
+0010-fix-noble-compile-error.patch
+0011-enable-armsom-sige7-early-PD-negotiation.patch
+0012-Add-support-for-the-Orange-Pi-5-boards.patch
+0013-add-support-for-aio-3588l.patch
+0014-board-rockchip-Add-the-ArmSoM-AIM7.patch
+0015-Revert-rockchip-resource-Add-avb-verify.patch

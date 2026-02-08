@@ -1,0 +1,317 @@
+From 749a5c7a492caa2da772d4a3867f2eac46b578a0 Mon Sep 17 00:00:00 2001
+From: Joshua Riek <jjriek@verizon.net>
+Date: Sun, 14 Apr 2024 23:07:55 -0400
+Subject: [PATCH 11/14] enable armsom-sige7 early PD negotiation
+
+---
+ arch/arm/dts/rk3588-armsom-sige7.dts          | 73 +++++++++++++++++++
+ arch/arm/mach-rockchip/rk3588/Kconfig         |  7 ++
+ board/armsom/armsom-sige7-rk3588/Kconfig      | 15 ++++
+ board/armsom/armsom-sige7-rk3588/Makefile     |  7 ++
+ .../armsom-sige7-rk3588/armsom-sige7-rk3588.c | 33 +++++++++
+ configs/armsom-sige7-rk3588_defconfig         | 13 +++-
+ drivers/power/power_delivery/tcpm.c           |  4 +-
+ include/configs/armsom-sige7-rk3588.h         | 28 +++++++
+ 8 files changed, 175 insertions(+), 5 deletions(-)
+ create mode 100644 board/armsom/armsom-sige7-rk3588/Kconfig
+ create mode 100644 board/armsom/armsom-sige7-rk3588/Makefile
+ create mode 100644 board/armsom/armsom-sige7-rk3588/armsom-sige7-rk3588.c
+ create mode 100644 include/configs/armsom-sige7-rk3588.h
+
+diff --git a/arch/arm/dts/rk3588-armsom-sige7.dts b/arch/arm/dts/rk3588-armsom-sige7.dts
+index 36183d0415e..39400da5e7e 100755
+--- a/arch/arm/dts/rk3588-armsom-sige7.dts
++++ b/arch/arm/dts/rk3588-armsom-sige7.dts
+@@ -8,6 +8,7 @@
+ #include "rk3588.dtsi"
+ #include "rk3588-u-boot.dtsi"
+ #include <dt-bindings/input/input.h>
++#include <dt-bindings/usb/pd.h>
+ 
+ / {
+ 	model = "ArmSoM SIGE7";
+@@ -75,6 +76,78 @@
+ 	};
+ };
+ 
++&i2c3 {
++	u-boot,dm-pre-reloc;
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2c3m0_xfer>;
++
++	status = "okay";
++
++	usbc0: fusb302@22 {
++		compatible = "fcs,fusb302";
++		u-boot,dm-pre-reloc;
++		reg = <0x22>;
++		interrupt-parent = <&gpio3>;
++		interrupts = <RK_PC4 IRQ_TYPE_LEVEL_LOW>;
++		int-n-gpios = <&gpio3 RK_PC4 GPIO_ACTIVE_LOW>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&usbc0_int>;
++		// vbus-supply = <&vcc12v_dcin>;
++		status = "okay";
++
++		usb_con: connector {
++			u-boot,dm-pre-reloc;
++			compatible = "usb-c-connector";
++			label = "USB-C";
++			data-role = "dual";
++			power-role = "sink";
++			try-power-role = "sink";
++			op-sink-microwatt = <1000000>;
++			sink-pdos =
++				<PDO_FIXED(5000, 3000, PDO_FIXED_USB_COMM)
++				 PDO_VAR(5000, 12000, 5000)>;
++		};
++	};
++};
++
++&pinctrl {
++	u-boot,dm-pre-reloc;
++	status = "okay";
++
++	usbc {
++		u-boot,dm-pre-reloc;
++		usbc0_int: usbc0-int {
++			u-boot,dm-pre-reloc;
++			rockchip,pins = <3 RK_PC4 RK_FUNC_GPIO &pcfg_pull_up>;
++		};
++	};
++};
++
++&i2c3m0_xfer {
++	u-boot,dm-pre-reloc;
++};
++
++&php_grf {
++	u-boot,dm-pre-reloc;
++};
++
++&ioc {
++	u-boot,dm-pre-reloc;
++};
++
++&cru {
++	u-boot,dm-pre-reloc;
++};
++
++&pcfg_pull_none_smt {
++	u-boot,dm-pre-reloc;
++};
++
++&gpio3 {
++	u-boot,dm-pre-reloc;
++	status = "okay";
++};
++
+ &pcie3x4 {
+ 	u-boot,dm-pre-reloc;
+ 	reset-gpios = <&gpio4 RK_PB6 GPIO_ACTIVE_HIGH>;
+diff --git a/arch/arm/mach-rockchip/rk3588/Kconfig b/arch/arm/mach-rockchip/rk3588/Kconfig
+index 93f58c93910..9d1477b90aa 100644
+--- a/arch/arm/mach-rockchip/rk3588/Kconfig
++++ b/arch/arm/mach-rockchip/rk3588/Kconfig
+@@ -15,6 +15,12 @@ config TARGET_ROC_RK3588S_PC
+ 	  It also includes on-board eMMC and LPDDR4. Expansion connectors
+ 	  provide access to display pins, MIPI-CSI/DSI, I2C, SPI, UART and GPIOs.
+ 
++config TARGET_ARMSOM_SIGE7_RK3588
++	bool "ARMSOM_SIGE7_RK3588"
++	select BOARD_LATE_INIT
++	help
++	  foobar
++
+ config SYS_SOC
+ 	default "rockchip"
+ 
+@@ -23,5 +29,6 @@ config SYS_MALLOC_F_LEN
+ 
+ source board/rockchip/evb_rk3588/Kconfig
+ source board/firefly/roc-rk3588s-pc/Kconfig
++source board/armsom/armsom-sige7-rk3588/Kconfig
+ 
+ endif
+diff --git a/board/armsom/armsom-sige7-rk3588/Kconfig b/board/armsom/armsom-sige7-rk3588/Kconfig
+new file mode 100644
+index 00000000000..3bfe46c6593
+--- /dev/null
++++ b/board/armsom/armsom-sige7-rk3588/Kconfig
+@@ -0,0 +1,15 @@
++if TARGET_ARMSOM_SIGE7_RK3588
++
++config SYS_BOARD
++	default "armsom-sige7-rk3588"
++
++config SYS_VENDOR
++	default "armsom"
++
++config SYS_CONFIG_NAME
++	default "armsom-sige7-rk3588"
++
++config BOARD_SPECIFIC_OPTIONS # dummy
++	def_bool y
++
++endif
+diff --git a/board/armsom/armsom-sige7-rk3588/Makefile b/board/armsom/armsom-sige7-rk3588/Makefile
+new file mode 100644
+index 00000000000..a77e1a07219
+--- /dev/null
++++ b/board/armsom/armsom-sige7-rk3588/Makefile
+@@ -0,0 +1,7 @@
++#
++# SPDX-License-Identifier:	GPL-2.0+
++#
++# Copyright (c) 2021 Rockchip Electronics Co., Ltd
++#
++
++obj-y	+= armsom-sige7-rk3588.o
+diff --git a/board/armsom/armsom-sige7-rk3588/armsom-sige7-rk3588.c b/board/armsom/armsom-sige7-rk3588/armsom-sige7-rk3588.c
+new file mode 100644
+index 00000000000..81c50899441
+--- /dev/null
++++ b/board/armsom/armsom-sige7-rk3588/armsom-sige7-rk3588.c
+@@ -0,0 +1,33 @@
++/*
++ * SPDX-License-Identifier:     GPL-2.0+
++ *
++ * (C) Copyright 2021 Rockchip Electronics Co., Ltd
++ */
++
++#include <common.h>
++#include <dwc3-uboot.h>
++#include <usb.h>
++
++DECLARE_GLOBAL_DATA_PTR;
++
++#ifdef CONFIG_USB_DWC3
++static struct dwc3_device dwc3_device_data = {
++	.maximum_speed = USB_SPEED_HIGH,
++	.base = 0xfc000000,
++	.dr_mode = USB_DR_MODE_PERIPHERAL,
++	.index = 0,
++	.dis_u2_susphy_quirk = 1,
++	.usb2_phyif_utmi_width = 16,
++};
++
++int usb_gadget_handle_interrupts(void)
++{
++	dwc3_uboot_handle_interrupt(0);
++	return 0;
++}
++
++int board_usb_init(int index, enum usb_init_type init)
++{
++	return dwc3_uboot_init(&dwc3_device_data);
++}
++#endif
+diff --git a/configs/armsom-sige7-rk3588_defconfig b/configs/armsom-sige7-rk3588_defconfig
+index 98944df4587..68304000220 100755
+--- a/configs/armsom-sige7-rk3588_defconfig
++++ b/configs/armsom-sige7-rk3588_defconfig
+@@ -19,7 +19,7 @@ CONFIG_LOADER_INI="RK3588MINIALL.ini"
+ CONFIG_TRUST_INI="RK3588TRUST.ini"
+ CONFIG_SPL_SERIAL_SUPPORT=y
+ CONFIG_SPL_DRIVERS_MISC_SUPPORT=y
+-CONFIG_TARGET_EVB_RK3588=y
++CONFIG_TARGET_ARMSOM_SIGE7_RK3588=y
+ CONFIG_SPL_LIBDISK_SUPPORT=y
+ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI_SUPPORT=y
+@@ -33,8 +33,6 @@ CONFIG_SPL_FIT_IMAGE_POST_PROCESS=y
+ CONFIG_SPL_FIT_HW_CRYPTO=y
+ # CONFIG_SPL_SYS_DCACHE_OFF is not set
+ CONFIG_BOOTDELAY=0
+-CONFIG_DISABLE_CONSOLE=y
+-CONFIG_SYS_CONSOLE_INFO_QUIET=y
+ # CONFIG_DISPLAY_CPUINFO is not set
+ CONFIG_ANDROID_BOOTLOADER=y
+ CONFIG_ANDROID_AVB=y
+@@ -86,6 +84,7 @@ CONFIG_SPL_OF_CONTROL=y
+ CONFIG_SPL_DTB_MINIMUM=y
+ CONFIG_OF_LIVE=y
+ CONFIG_OF_SPL_REMOVE_PROPS="clock-names interrupt-parent assigned-clocks assigned-clock-rates assigned-clock-parents"
++CONFIG_OF_U_BOOT_REMOVE_PROPS="clock-names interrupt-parent assigned-clocks assigned-clock-rates assigned-clock-parents"
+ # CONFIG_NET_TFTP_VARS is not set
+ CONFIG_REGMAP=y
+ CONFIG_SPL_REGMAP=y
+@@ -108,6 +107,7 @@ CONFIG_SPL_SCMI_FIRMWARE=y
+ CONFIG_ROCKCHIP_GPIO=y
+ CONFIG_ROCKCHIP_GPIO_V2=y
+ CONFIG_SYS_I2C_ROCKCHIP=y
++CONFIG_I2C_MUX=y
+ CONFIG_DM_KEY=y
+ CONFIG_ADC_KEY=y
+ CONFIG_MISC=y
+@@ -154,6 +154,11 @@ CONFIG_PINCTRL=y
+ CONFIG_SPL_PINCTRL=y
+ CONFIG_DM_PMIC=y
+ CONFIG_PMIC_SPI_RK8XX=y
++CONFIG_DM_POWER_DELIVERY=y
++CONFIG_TYPEC_TCPM=y
++CONFIG_TYPEC_TCPCI=y
++CONFIG_TYPEC_HUSB311=y
++CONFIG_TYPEC_FUSB302=y
+ CONFIG_REGULATOR_PWM=y
+ CONFIG_DM_REGULATOR_FIXED=y
+ CONFIG_DM_REGULATOR_GPIO=y
+@@ -214,3 +219,5 @@ CONFIG_AVB_LIBAVB_AB=y
+ CONFIG_AVB_LIBAVB_ATX=y
+ CONFIG_AVB_LIBAVB_USER=y
+ CONFIG_RK_AVB_LIBAVB_USER=y
++CONFIG_CMD_CHARGE_DISPLAY=y
++CONFIG_DM_CHARGE_DISPLAY=y
+diff --git a/drivers/power/power_delivery/tcpm.c b/drivers/power/power_delivery/tcpm.c
+index 22334c6230c..1b94a401836 100644
+--- a/drivers/power/power_delivery/tcpm.c
++++ b/drivers/power/power_delivery/tcpm.c
+@@ -1390,8 +1390,8 @@ static void tcpm_pd_rx_handler(struct tcpm_port *port,
+ 		 */
+ 		if (!!(le16_to_cpu(msg->header) & PD_HEADER_DATA_ROLE) ==
+ 		    (port->data_role == TYPEC_HOST)) {
+-			printf("Data role mismatch, initiating error recovery\n");
+-			tcpm_set_state(port, ERROR_RECOVERY, 0);
++			printf("Data role mismatch, hard resetting...\n");
++			tcpm_set_state(port, HARD_RESET_SEND, 0);
+ 		} else {
+ 			if (cnt)
+ 				tcpm_pd_data_request(port, msg);
+diff --git a/include/configs/armsom-sige7-rk3588.h b/include/configs/armsom-sige7-rk3588.h
+new file mode 100644
+index 00000000000..d067c25ddc6
+--- /dev/null
++++ b/include/configs/armsom-sige7-rk3588.h
+@@ -0,0 +1,28 @@
++/*
++ * SPDX-License-Identifier:     GPL-2.0+
++ *
++ * Copyright (c) 2021 Rockchip Electronics Co., Ltd
++ */
++
++#ifndef __CONFIGS_ARMSOM_SIGE7_RK3588_H
++#define __CONFIGS_ARMSOM_SIGE7_RK3588_H
++
++#include <configs/rk3588_common.h>
++
++#undef CONFIG_PREBOOT
++#define CONFIG_PREBOOT "charge_pd"
++
++#ifndef CONFIG_SPL_BUILD
++
++#undef ROCKCHIP_DEVICE_SETTINGS
++#define ROCKCHIP_DEVICE_SETTINGS \
++		"stdout=serial,vidconsole\0" \
++		"stderr=serial,vidconsole\0"
++
++#define CONFIG_SYS_MMC_ENV_DEV		0
++
++#undef CONFIG_BOOTCOMMAND
++#define CONFIG_BOOTCOMMAND RKIMG_BOOTCOMMAND
++
++#endif
++#endif
+\ No newline at end of file
+-- 
+2.25.1
+

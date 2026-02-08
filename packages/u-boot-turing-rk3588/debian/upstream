@@ -1,0 +1,3 @@
+GIT=https://github.com/u-boot/u-boot.git    
+COMMIT=cb493752394adec8db1d6f5e9b8fb3c43e13f10a
+BRANCH=master

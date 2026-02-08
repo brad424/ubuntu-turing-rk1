@@ -1,0 +1,108 @@
+u-boot-turing-rk3588 (2024.01-4) jammy; urgency=medium
+
+  * Update ddr and spl blobs
+
+ -- Joshua Riek <jjriek@verizon.net>  Wed, 12 Jun 2024 20:11:59 -0400
+
+u-boot-turing-rk3588 (2024.01-3) jammy; urgency=medium
+
+  * Update U-Boot install scripts
+
+ -- Joshua Riek <jjriek@verizon.net>  Wed, 12 Jun 2024 18:42:39 -0400
+
+u-boot-turing-rk3588 (2024.01-2) jammy; urgency=medium
+
+  * Use flashcp to update spi flash
+
+ -- Joshua Riek <jjriek@verizon.net>  Mon, 25 Mar 2024 14:10:40 -0400
+
+u-boot-turing-rk3588 (2024.01-1) jammy; urgency=medium
+
+  * Bump to 2024.01 release
+
+ -- Joshua Riek <jjriek@verizon.net>  Fri, 19 Jan 2024 16:34:24 -0500
+
+u-boot-turing-rk3588 (2024.01~rc1-3) jammy; urgency=medium
+
+  * Cleanup packging and add Mixtile Core 3588E patch
+
+ -- Joshua Riek <jjriek@verizon.net>  Sun, 24 Dec 2023 10:06:16 -0500
+
+u-boot-turing-rk3588 (2024.01~rc1-2) jammy; urgency=medium
+
+  * Fix HS400 in Linux userspace 
+
+ -- Joshua Riek <jjriek@verizon.net>  Sun, 12 Nov 2023 13:25:39 -0500
+
+u-boot-turing-rk3588 (2024.01~rc1-1) jammy; urgency=medium
+
+  * Sync the Turing RK1 DTS with mainline Linux
+  * Bump to mainline u-boot v2024.01-rc1
+
+ -- Joshua Riek <jjriek@verizon.net>  Sat, 28 Oct 2023 10:48:12 -0400
+
+u-boot-turing-rk3588 (2023.10-9) jammy; urgency=medium
+
+  * Bump build number for launchpad rebuild
+
+ -- Joshua Riek <jjriek@verizon.net>  Fri, 27 Oct 2023 14:57:58 -0400
+
+u-boot-turing-rk3588 (2023.10-8) jammy; urgency=medium
+
+  * Cleanup and rebase Turing RK1 patch
+  * Add u-boot install scripts
+
+ -- Joshua Riek <jjriek@verizon.net>  Thu, 26 Oct 2023 17:53:16 -0400
+
+u-boot-turing-rk3588 (2023.10-7) jammy; urgency=medium
+
+  * Move u-boot install dir
+  * Cleanup the Turing RK1 u-boot patch 
+
+ -- Joshua Riek <jjriek@verizon.net>  Fri, 20 Oct 2023 21:01:28 -0400
+
+u-boot-turing-rk3588 (2023.10-6) jammy; urgency=medium
+
+  * set boot targets to MMC1 -> NVMe -> SCSI -> USB -> MMC0
+
+ -- Joshua Riek <jjriek@verizon.net>  Sun, 15 Oct 2023 10:33:46 -0400
+
+u-boot-turing-rk3588 (2023.10-5) jammy; urgency=medium
+
+  * Fix baudrate in DDR blob
+  * Fix compile errors
+  * Remove ddrbin_tool
+
+ -- Joshua Riek <jjriek@verizon.net>  Sat, 14 Oct 2023 23:26:26 -0400
+
+u-boot-turing-rk3588 (2023.10-4) jammy; urgency=medium
+
+  * update DDR blob to use UART9 with a 115200 baudrate
+
+ -- Joshua Riek <jjriek@verizon.net>  Sat, 14 Oct 2023 22:16:28 -0400
+
+u-boot-turing-rk3588 (2023.10-3) jammy; urgency=medium
+
+  * use UART9 with a 115200 baudrate
+
+ -- Joshua Riek <jjriek@verizon.net>  Sat, 14 Oct 2023 21:18:07 -0400
+
+u-boot-turing-rk3588 (2023.10-2) jammy; urgency=medium
+
+  * enable USB XHCI PCI boot support
+  * enable SATA AHCI boot support
+  * set boot targets to MMC1 -> USB -> NVMe -> SCSI -> MMC0
+
+ -- Joshua Riek <jjriek@verizon.net>  Sat, 14 Oct 2023 11:51:11 -0400
+
+u-boot-turing-rk3588 (2023.10-1) jammy; urgency=medium
+
+  * Bump to mainline u-boot v2023.10.
+
+ -- Joshua Riek <jjriek@verizon.net>  Wed, 11 Oct 2023 18:53:15 -0400
+
+u-boot-turing-rk3588 (2017.09+20230920.git609a77ef-1) jammy; urgency=medium
+
+  * Initial packaging.
+
+ -- Joshua Riek <jjriek@verizon.net>  Tue, 03 Oct 2023 19:29:05 -0400
