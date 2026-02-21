@@ -25,6 +25,15 @@ if [ ! -d "${UBOOT_PACKAGE}" ]; then
 fi
 cd "${UBOOT_PACKAGE}"
 
+# Install build dependencies
+apt-get install -y swig python3-dev python3-setuptools
+
+# Disable pylibfdt to avoid SWIG compatibility issues
+export NO_SDL=1
+export PYTHON=python3
+export DTC_FLAGS="-@"
+make -C scripts/dtc clean 2>/dev/null || true
+
 # Target package to build
 rules=${UBOOT_RULES_TARGET},package-${UBOOT_RULES_TARGET}
 if [[ -n ${UBOOT_RULES_TARGET_EXTRA} ]]; then

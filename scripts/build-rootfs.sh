@@ -71,7 +71,7 @@ export IMAGE_TARGETS=none
 lb config \
     --architecture arm64 \
     --bootstrap-qemu-arch arm64 \
-    --bootstrap-qemu-static /usr/bin/qemu-aarch64-static \
+    --bootstrap-qemu-static /usr/bin/qemu-aarch64 \
     --archive-areas "main restricted universe multiverse" \
     --parent-archive-areas "main restricted universe multiverse" \
     --mirror-bootstrap "http://ports.ubuntu.com" \
@@ -125,7 +125,7 @@ echo "software-properties-common" > config/package-lists/my.list.chroot
 if [ "${PROJECT}" == "ubuntu" ]; then
     # Specific packages to install for ubuntu desktop
     (
-        echo "ubuntu-desktop-rockchip"
+        #echo "ubuntu-desktop-rockchip"
         echo "oem-config-gtk"
         echo "ubiquity-frontend-gtk"
         echo "ubiquity-slideshow-ubuntu"

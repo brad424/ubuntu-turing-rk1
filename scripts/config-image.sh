@@ -75,7 +75,7 @@ fi
 
 setup_mountpoint() {
     local mountpoint="$1"
-
+    echo $mountpoint
     if [ ! -c /dev/mem ]; then
         mknod -m 660 /dev/mem c 1 1
         chown root:kmem /dev/mem
