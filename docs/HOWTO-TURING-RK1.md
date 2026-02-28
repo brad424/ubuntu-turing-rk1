@@ -15,7 +15,7 @@ Complete guide for building Ubuntu images for the Turing RK1 board.
 sudo apt-get update
 sudo apt-get install -y build-essential gcc-aarch64-linux-gnu bison \
   flex libssl-dev bc device-tree-compiler dosfstools mtools parted \
-  debootstrap qemu-user-static git wget xz-utils
+  debootstrap qemu-user-static git wget xz-utils python3-pyelftools
 ```
 
 ## Quick Start
